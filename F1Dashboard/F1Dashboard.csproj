@@ -54,11 +54,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ColorSet.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="F1Data.cs" />
     <Compile Include="Formatter.cs" />
     <Compile Include="Lap.cs" />
+    <Compile Include="SteeringWheelDisplay.cs" />
+    <Compile Include="SteeringWheelLeds.cs" />
     <Compile Include="UDPServer.cs" />
+    <Compile Include="Util.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

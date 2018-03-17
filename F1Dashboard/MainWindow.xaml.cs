@@ -1,21 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Threading;
-using System.Net;
-using System.Net.Sockets;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using System.Windows.Media;
 namespace F1Dashboard
 {
     /// <summary>
@@ -33,6 +21,11 @@ namespace F1Dashboard
         private F1Data data;
         private F1Data prevData;
         private List<Lap> laps;
+        private Brush whiteBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#7FFFFFFF"));
+        private SteeringWheelDisplay sw_display;
+        private SteeringWheelLeds sw_leds;
+        private int start_range = 90;
+        private int end_range = 360 - 90;
 
         public MainWindow()
         {
@@ -42,52 +35,97 @@ namespace F1Dashboard
             listenThread = new Thread(() => server.listen());
             listenThread.Start();
             InitializeComponent();
-            this.UpdateSpeedLine(-45);
-            this.UpdateRpmLine(-45);
+            this.sw_display = new SteeringWheelDisplay(this.c_display);
+            this.sw_leds = new SteeringWheelLeds(this.c_leds);
+            this.UpdateSpeedLine(0);
+            this.UpdateRpmLine(0);
+            this.DrawSpeedSteps();
+            this.DrawRpmSteps();
+            this.sw_display.Init();
+            this.sw_leds.Init();
         }
 
-        private double degToRad(double angle)
+        private void DrawLine(Point p1, Point p2, Brush brush, int thickness)
         {
-            return Math.PI / 180 * angle;
+            Line line = new Line();
+            line.X1 = p1.X;
+            line.Y1 = p1.Y;
+            line.X2 = p2.X;
+            line.Y2 = p2.Y;
+            line.Stroke = brush;
+            line.StrokeThickness = thickness;
+            this.canvas.Children.Add(line);
         }
 
-        private Point rotate(Point point, Point center, double degrees)
+        private void DrawSpeedSteps()
         {
-            double angle = degToRad(degrees);
-            double sin = Math.Sin(angle);
-            double cos = Math.Cos(angle);
+            Point center = new Point(100, 100);
+            Point point1 = Util.Rotate(new Point(15, 100), center, -90);
+            Point point2 = Util.Rotate(new Point(20, 100), center, -90);
+            int step_unit = 10;
+            float total_steps = 400 / step_unit;
+            float distance = 270f;
+            float step_deg_size = distance / total_steps;
 
-            double new_p1x = (cos * (point.X - center.X)) - (sin * (point.Y - center.Y)) + center.Y;
-            double new_p1y = (sin * (point.X - center.X)) + (cos * (point.Y - center.Y)) + center.Y;
+            for (int i = 0; i <= total_steps; i++)
+            {
+                float deg = (i * step_deg_size);
+                Point p1 = Util.Rotate(point1, center, deg);
+                Point p2 = Util.Rotate(point2, center, deg);
+                DrawLine(p1, p2, whiteBrush, 2);
+            }
+        }
 
-            return new Point(new_p1x, new_p1y);
+
+        private void DrawRpmSteps()
+        {
+            Point center = new Point(100, 100);
+            Point point1 = Util.Rotate(new Point(30, 100), center, -90);
+            Point point2 = Util.Rotate(new Point(50, 100), center, -90);
+
+            int step_unit = 1000;
+            float total_steps = 14000 / step_unit;
+            float distance = 270f;
+            float step_deg_size = distance / total_steps;
+
+            for (int i = 0; i <= total_steps; i++)
+            {
+                float deg = (i * step_deg_size);
+                Point p1 = Util.Rotate(point1, center, deg);
+                Point p2 = Util.Rotate(point2, center, deg);
+                DrawLine(p1, p2, whiteBrush, 2);
+            }
         }
 
         private void UpdateSpeedLine(double degrees)
         {
-            Point point = new Point(10, 100);
+            Point point1 = new Point(11, 100);
+            Point point2 = new Point(20, 100);
             Point center = new Point(100, 100);
 
-            point = rotate(point, center, degrees);
-            
-            this.line_speed.X1 = point.X;
-            this.line_speed.Y1 = point.Y;
-            this.line_speed.X2 = center.X;
-            this.line_speed.Y2 = center.Y;
+            point1 = Util.Rotate(point1, center, degrees);
+            point2 = Util.Rotate(point2, center, degrees);
+
+            this.line_speed.X1 = point1.X;
+            this.line_speed.Y1 = point1.Y;
+            this.line_speed.X2 = point2.X;
+            this.line_speed.Y2 = point2.Y;
         }
 
 
         private void UpdateRpmLine(double degrees)
         {
-            Point point = new Point(30, 100);
+            Point point1 = new Point(30, 100);
+            Point point2 = new Point(85, 100);
             Point center = new Point(100, 100);
 
-            point = rotate(point, center, degrees);
+            point1 = Util.Rotate(point1, center, degrees);
+            point2 = Util.Rotate(point2, center, degrees);
 
-            this.line_rpm.X1 = point.X;
-            this.line_rpm.Y1 = point.Y;
-            this.line_rpm.X2 = center.X;
-            this.line_rpm.Y2 = center.Y;
+            this.line_rpm.X1 = point1.X;
+            this.line_rpm.Y1 = point1.Y;
+            this.line_rpm.X2 = point2.X;
+            this.line_rpm.Y2 = point2.Y;
         }
 
         private void OnPacketReceived(byte[] packet)
@@ -95,16 +133,17 @@ namespace F1Dashboard
             prevData = data;
             data = new F1Data(packet);
             // Calc
-            float engineRate = (int)data.Get("engineRate");
-            float engineRatePercent = engineRate * 100 / 14000;
+            float engineRate = data.Get("engineRate");
+            float engineRatePercent = Util.GetPercent(engineRate, 14000);
 
-            float speed = (int)(data.Get("speed") * 3.6);
-            float speedPercent = speed * 100 / 400;
+            float speed = Util.MPHtoKMH(data.Get("speed"));
+            float speedPercent = Util.GetPercent(speed, 100);
 
             float throttle = data.Get("throttle");
-            float throttlePercent = throttle * 100 / 1;
+            float throttlePercent = Util.GetPercent(throttle, 1);
+
             float brake = data.Get("brake");
-            float brakePercent = brake * 100 / 1;
+            float brakePercent = Util.GetPercent(brake, 1);
 
             // Update
             if (speed > speed_max)
@@ -121,44 +160,30 @@ namespace F1Dashboard
                 Console.WriteLine("LAP: {0} LAP TIME: {1} LAP TIME: {2}", prevData.Get("lap"), prevData.Get("lapTime"), data.Get("last_lap_time"));
             }
 
-            int start_range = +45;
-            int end_range = 360 - 90;
-
-            float speed_degrees = (speed * end_range / 400) - start_range;
-            float rpm_degrees = (engineRate * end_range / 14000) - start_range;
+            float speed_degrees = Util.CalcDegrees(speed, start_range, end_range, 400);
+            float rpm_degrees = Util.CalcDegrees(engineRate, start_range, end_range, 14000);
 
             // Draw
             this.Dispatcher.Invoke(() =>
             { 
-                this.lbl_rpm.Content = String.Format("{0} RPM", engineRate, engineRatePercent);
-                this.lbl_speed.Content = String.Format("{0} KM/h", speed);
-                this.lbl_speed_max.Content = String.Format("max: {0} KM / h", speed_max); 
+                this.lbl_speed_max.Content = String.Format("max: {0:N0} KM / h", speed_max); 
                 this.lbl_time.Content = Formatter.Seconds(data.Get("time"));
                 this.lbl_lapTime.Content = Formatter.Seconds(data.Get("lapTime"));
                 this.lbl_sector1_time.Content = Formatter.Seconds(data.Get("sector1_time"));
                 this.lbl_sector2_time.Content = Formatter.Seconds(data.Get("sector2_time"));
                 this.lbl_last_lap_time.Content = Formatter.Seconds(data.Get("last_lap_time"));
-                this.pbar_rpm.Value = engineRatePercent;
-                this.pbar_speed.Value = speedPercent;
                 this.pbar_throttle.Value = throttlePercent;
                 this.pbar_brake.Value = brakePercent;
-                this.lbl_gear.Content = Constants.GEARS[(int)data.Get("gear")];
-
-                this.lbl_wheel_speed_bl.Content = data.Get("wheel_speed_bl");
-                this.lbl_wheel_speed_br.Content = data.Get("wheel_speed_br");
-                this.lbl_wheel_speed_fl.Content = data.Get("wheel_speed_fl");
-                this.lbl_wheel_speed_fr.Content = data.Get("wheel_speed_fr");
 
                 this.UpdateSpeedLine(speed_degrees);
                 this.UpdateRpmLine(rpm_degrees);
                 // this.dgrid_data.ItemsSource = LoadTableData(data);
+
+                this.sw_leds.Update(engineRate);
+                sw_display.Update(data);
+                sw_display.Draw();
             });
             
-        }
-
-        private void slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            this.UpdateSpeedLine(this.slider.Value);
         }
     }
 }
