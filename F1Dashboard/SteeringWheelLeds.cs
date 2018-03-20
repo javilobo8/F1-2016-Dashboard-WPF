@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -38,7 +33,7 @@ namespace F1Dashboard
                 Ellipse elip = new Ellipse() {
                     Width = led_size,
                     Height = led_size,
-                    Fill = ColorSet.DarkGray
+                    Fill = ColorSet.DARK_GRAY
                 };
                 Canvas.SetTop(elip, margin);
                 Canvas.SetLeft(elip, i * led_offset + margin);
@@ -50,7 +45,7 @@ namespace F1Dashboard
             {
                 Width = C_WIDTH,
                 Height = C_HEIGHT,
-                Stroke = ColorSet.DarkGray,
+                Stroke = ColorSet.DARK_GRAY,
                 StrokeThickness = 2
             };
             Canvas.SetTop(rect, 0);
@@ -66,18 +61,18 @@ namespace F1Dashboard
                 if (rpm > RPM_STEPS[i])
                 {
                     if (i < 5)
-                        this.leds[i].Fill = Brushes.Green;
+                        this.leds[i].Fill = ColorSet.LED_GREEN;
                     else if (i < 10)
-                        this.leds[i].Fill = Brushes.Red;
+                        this.leds[i].Fill = ColorSet.LED_RED;
                     else
-                        this.leds[i].Fill = Brushes.Blue;
+                        this.leds[i].Fill = ColorSet.LED_BLUE;
                     
                 } else
                 {
-                    this.leds[i].Fill = ColorSet.DarkGray;
+                    this.leds[i].Fill = ColorSet.DARK_GRAY;
                 }
                 if (rpm > RPM_MID)
-                    this.canvas.Background = Brushes.DarkRed;
+                    this.canvas.Background = ColorSet.DARK_RED;
                 else
                     this.canvas.Background = Brushes.Black;
             }

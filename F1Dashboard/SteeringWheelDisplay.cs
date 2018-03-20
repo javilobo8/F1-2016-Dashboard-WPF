@@ -39,7 +39,7 @@ namespace F1Dashboard
             {
                 Width = C_WIDTH,
                 Height = C_HEIGHT,
-                Stroke = ColorSet.DarkGray,
+                Stroke = ColorSet.DARK_GRAY,
                 StrokeThickness = 2
             };
             Canvas.SetTop(rect, 0);
@@ -51,7 +51,7 @@ namespace F1Dashboard
                 Y1 = C_HEIGHT / 2 + 30,
                 X2 = C_WIDTH,
                 Y2 = C_HEIGHT / 2 + 30,
-                Stroke = ColorSet.DarkGray,
+                Stroke = ColorSet.DARK_GRAY,
                 StrokeThickness = 1,
                 SnapsToDevicePixels = true
             });
@@ -61,7 +61,7 @@ namespace F1Dashboard
                 Y1 = 0,
                 X2 = C_WIDTH / 2 - 40,
                 Y2 = C_HEIGHT / 2 + 30,
-                Stroke = ColorSet.DarkGray,
+                Stroke = ColorSet.DARK_GRAY,
                 StrokeThickness = 1,
                 SnapsToDevicePixels = true
             });
@@ -71,7 +71,7 @@ namespace F1Dashboard
                 Y1 = 0,
                 X2 = C_WIDTH / 2 + 40,
                 Y2 = C_HEIGHT / 2 + 30,
-                Stroke = ColorSet.DarkGray,
+                Stroke = ColorSet.DARK_GRAY,
                 StrokeThickness = 1,
                 SnapsToDevicePixels = true
             });

@@ -59,6 +59,7 @@
     <Compile Include="F1Data.cs" />
     <Compile Include="Formatter.cs" />
     <Compile Include="Lap.cs" />
+    <Compile Include="Speedometer.cs" />
     <Compile Include="SteeringWheelDisplay.cs" />
     <Compile Include="SteeringWheelLeds.cs" />
     <Compile Include="UDPServer.cs" />
