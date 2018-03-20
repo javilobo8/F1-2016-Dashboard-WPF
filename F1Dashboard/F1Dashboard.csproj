@@ -54,6 +54,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ArduinoSerialPort.cs" />
     <Compile Include="ColorSet.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="F1Data.cs" />

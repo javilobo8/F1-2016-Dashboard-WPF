@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:F1Dashboard"
         mc:Ignorable="d"
-        Title="MainWindow" Height="528" Width="466" WindowStartupLocation="CenterScreen">
+        Title="F1 Dashboard" Height="528" Width="466" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     <Grid Margin="0,0,2,0">
         <Label x:Name="lbl_lapTime" Content="00.00.000" HorizontalAlignment="Left" Margin="55,367,0,0" VerticalAlignment="Top" Width="69" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" />
         <ProgressBar x:Name="pbar_throttle" HorizontalAlignment="Left" Height="10" Margin="124,324,0,0" VerticalAlignment="Top" Width="68" RenderTransformOrigin="0.5,0.5">
@@ -46,6 +46,8 @@
         </Canvas>
         <Canvas x:Name="c_display" HorizontalAlignment="Left" Height="250" VerticalAlignment="Top" Width="450" Background="Black" Margin="0,35,0,0"/>
         <Canvas x:Name="c_leds" HorizontalAlignment="Left" Height="35" VerticalAlignment="Top" Width="450" Background="Black"/>
+        <ComboBox x:Name="cmb_port" HorizontalAlignment="Left" Margin="10,424,0,0" VerticalAlignment="Top" Width="71"/>
+        <Button x:Name="btn_arduino_connect" Content="Connect Arduino" HorizontalAlignment="Left" Margin="86,424,0,0" VerticalAlignment="Top" Width="109" Height="22" Click="btn_arduino_connect_Click"/>
 
     </Grid>
 </Window>
